@@ -8,9 +8,9 @@
 
 namespace kuaigeng\review\src\tests;
 
-use xltxlm\redis\RedisCache;
 use PHPUnit\Framework\TestCase;
-use tests\redis\RedisConfigDemo;
+use xltxlm\redis\RedisCache;
+use xltxlm\redis\tests\RedisConfigDemo;
 
 class RedisCacheTest extends TestCase
 {
