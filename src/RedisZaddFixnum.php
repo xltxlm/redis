@@ -134,6 +134,9 @@ class RedisZaddFixnum
         return $this;
     }
 
+    /**
+     * @return ZaddUnit[]
+     */
     public function __invoke()
     {
         $Client = (new RedisClient())->setRedisConfig($this->getConfig());
@@ -146,5 +149,12 @@ class RedisZaddFixnum
         } else {
             $Client->zremrangebyrank($this->getKey(), 0, $this->getFixnum());
         }
+        $a = $Client->zrevrange($this->getKey(), 0, -1);
+        $ZaddUnit = [];
+        foreach ($a as $item) {
+            $score = $Client->zscore($this->getKey(), $item);
+            $ZaddUnit[] = (new ZaddUnit())->setName($item)->setScore($score);
+        }
+        return $ZaddUnit;
     }
 }

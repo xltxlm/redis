@@ -42,10 +42,12 @@ class RedisZaddFixnumTest extends TestCase
         for ($i = 1; $i <= 20; $i++) {
             $RedisZaddFixnum->setZaddUnit(
                 (new ZaddUnit())
-                    ->setName("name:".$i)
-                    ->setScore($i)
+                    ->setName("name".$i)
+                    ->setScore($i + 10)
             );
         }
-        $RedisZaddFixnum->__invoke();
+        $data = $RedisZaddFixnum->__invoke();
+        $this->assertTrue(!empty($data));
+        $this->assertInstanceOf(ZaddUnit::class, $data[0]);
     }
 }
