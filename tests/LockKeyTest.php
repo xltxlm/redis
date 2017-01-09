@@ -35,4 +35,20 @@ class LockKeyTest extends TestCase
             echo "\n";
         }
     }
+
+    public function testlock()
+    {
+        $key = __METHOD__;
+        $i = 0;
+        while ($i++ < 10) {
+            $LockKey = (new LockKey())
+                ->setRedisConfig(new RedisConfigDemo())
+                ->setKey($key)
+                ->setValue(date('r'))
+                ->setExpire(3)
+                ->__invoke();
+            var_dump($LockKey);
+        }
+    }
+
 }
