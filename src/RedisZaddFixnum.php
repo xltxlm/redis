@@ -149,11 +149,11 @@ final class RedisZaddFixnum
             $this->RedisClient->zremrangebyrank($this->getKey(), 0, $this->getFixnum());
             $zrevrange = $this->RedisClient->zrevrange($this->getKey(), 0, -1);
         }
-        $this->ZaddUnit = [];
+        $ZaddUnit = [];
         foreach ($zrevrange as $item) {
             $score = $this->RedisClient->zscore($this->getKey(), $item);
-            $this->ZaddUnit[] = (new ZaddUnit())->setName($item)->setScore($score);
+            $ZaddUnit[] = (new ZaddUnit())->setName($item)->setScore($score);
         }
-        return $this->ZaddUnit;
+        return $ZaddUnit;
     }
 }
