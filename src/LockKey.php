@@ -91,7 +91,7 @@ final class LockKey
      */
     public function getValue(): string
     {
-        return $this->value;
+        return $this->value ?: date('Y-m-d H:i:s');
     }
 
     /**
