@@ -29,7 +29,15 @@ class RedisZaddFixnumTest extends TestCase
                     ->setScore($i)
             );
         }
-        $RedisZaddFixnum->__invoke();
+        $datas = $RedisZaddFixnum->__invoke();
+        //验证是否倒序
+        $old = 0;
+        foreach ($datas as $data) {
+            if ($old) {
+                $this->assertGreaterThan($data->getScore(), $old);
+            }
+            $old = $data->getScore();
+        }
     }
 
     public function testasc()
@@ -38,7 +46,7 @@ class RedisZaddFixnumTest extends TestCase
             ->setConfig(new RedisConfigDemo())
             ->setOrderby(RedisZaddFixnum::ORDER_ASC)
             ->setFixnum(2)
-            ->setKey("abc");
+            ->setKey("abcd");
         for ($i = 1; $i <= 20; $i++) {
             $RedisZaddFixnum->setZaddUnit(
                 (new ZaddUnit())
@@ -46,8 +54,18 @@ class RedisZaddFixnumTest extends TestCase
                     ->setScore($i + 10)
             );
         }
-        $data = $RedisZaddFixnum->__invoke();
-        $this->assertTrue(!empty($data));
-        $this->assertInstanceOf(ZaddUnit::class, $data[0]);
+        $datas = $RedisZaddFixnum->__invoke();
+        $this->assertTrue(!empty($datas));
+        $this->assertInstanceOf(ZaddUnit::class, $datas[0]);
+
+        //验证是否正序
+        $old = 0;
+        foreach ($datas as $data) {
+            if ($old) {
+                $this->assertGreaterThan($old, $data->getScore());
+            }
+            $old = $data->getScore();
+        }
+
     }
 }

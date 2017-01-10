@@ -8,6 +8,7 @@
 
 namespace xltxlm\redis;
 
+use Predis\Client;
 use xltxlm\redis\Config\RedisConfig;
 use xltxlm\redis\Util\ZaddUnit;
 
@@ -15,10 +16,12 @@ use xltxlm\redis\Util\ZaddUnit;
  * 有序集合,固定个数
  * Class RedisZaddFixnum.
  */
-class RedisZaddFixnum
+final class RedisZaddFixnum
 {
     public const ORDER_ASC = __LINE__;
     public const ORDER_DESC = __LINE__;
+    /** @var  Client */
+    private $RedisClient;
     /** @var string 集合的名称 */
     protected $key = '';
     /** @var int 固定个数 */
@@ -27,8 +30,15 @@ class RedisZaddFixnum
     protected $orderby = self::ORDER_DESC;
     /** @var RedisConfig */
     protected $config;
-    /** @var ZaddUnit[] */
-    protected $ZaddUnit;
+
+    /**
+     * @return Client
+     */
+    public function getRedisClient(): Client
+    {
+        return $this->RedisClient;
+    }
+
 
     /**
      * @return int
@@ -110,17 +120,10 @@ class RedisZaddFixnum
     public function setConfig(RedisConfig $config): RedisZaddFixnum
     {
         $this->config = $config;
-
+        $this->RedisClient = (new RedisClient())->setRedisConfig($this->getConfig());
         return $this;
     }
 
-    /**
-     * @return ZaddUnit[]
-     */
-    public function getZaddUnit(): array
-    {
-        return $this->ZaddUnit;
-    }
 
     /**
      * @param ZaddUnit $ZaddUnit
@@ -129,8 +132,7 @@ class RedisZaddFixnum
      */
     public function setZaddUnit(ZaddUnit $ZaddUnit): RedisZaddFixnum
     {
-        $this->ZaddUnit[] = $ZaddUnit;
-
+        $this->getRedisClient()->zadd($this->getKey(), $ZaddUnit->getScore(), $ZaddUnit->getName());
         return $this;
     }
 
@@ -139,22 +141,19 @@ class RedisZaddFixnum
      */
     public function __invoke()
     {
-        $Client = (new RedisClient())->setRedisConfig($this->getConfig());
-        foreach ($this->getZaddUnit() as $zaddUnit) {
-            $Client->zadd($this->getKey(), $zaddUnit->getScore(), $zaddUnit->getName());
-        }
         //截断数据,保留分数最大的内容
         if ($this->getOrderby() == self::ORDER_ASC) {
-            $Client->zremrangebyrank($this->getKey(), $this->getFixnum(), -1);
+            $this->RedisClient->zremrangebyrank($this->getKey(), $this->getFixnum(), -1);
+            $zrevrange = $this->RedisClient->zrange($this->getKey(), 0, -1);
         } else {
-            $Client->zremrangebyrank($this->getKey(), 0, $this->getFixnum());
+            $this->RedisClient->zremrangebyrank($this->getKey(), 0, $this->getFixnum());
+            $zrevrange = $this->RedisClient->zrevrange($this->getKey(), 0, -1);
         }
-        $a = $Client->zrevrange($this->getKey(), 0, -1);
-        $ZaddUnit = [];
-        foreach ($a as $item) {
-            $score = $Client->zscore($this->getKey(), $item);
-            $ZaddUnit[] = (new ZaddUnit())->setName($item)->setScore($score);
+        $this->ZaddUnit = [];
+        foreach ($zrevrange as $item) {
+            $score = $this->RedisClient->zscore($this->getKey(), $item);
+            $this->ZaddUnit[] = (new ZaddUnit())->setName($item)->setScore($score);
         }
-        return $ZaddUnit;
+        return $this->ZaddUnit;
     }
 }
