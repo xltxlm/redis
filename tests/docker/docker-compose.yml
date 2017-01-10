@@ -1,0 +1,19 @@
+version: '2'
+
+services:
+  redis:
+    image: redis
+    volumes:
+      - ../../:/redis/
+      - ./redis/:/data/
+    networks:
+      comm:
+        aliases:
+          - redis
+    ports:
+        - "6379:6379/tcp"
+    entrypoint: "redis-server --appendonly yes"
+    restart: always
+
+networks:
+    comm:
