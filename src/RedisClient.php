@@ -11,7 +11,7 @@ namespace xltxlm\redis;
 use Predis\Client;
 use xltxlm\redis\Config\RedisConfig;
 
-final class RedisClient
+class RedisClient
 {
     /** @var RedisConfig */
     protected $redisConfig;
