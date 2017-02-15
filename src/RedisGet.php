@@ -16,15 +16,29 @@ use xltxlm\redis\Config\RedisConfig;
  * Class RedisGet
  * @package xltxlm\redis
  */
-class RedisGet extends RedisClient
+class RedisGet
 {
     protected static $keys = [];
     /** @var Client */
     protected $client;
 
-    public function setRedisConfig(RedisConfig $redisConfig): Client
+    /** @var RedisConfig */
+    protected $redisConfig;
+
+    /**
+     * @param RedisConfig $redisConfig
+     * @return RedisGet
+     */
+    public function setRedisConfig(RedisConfig $redisConfig)
     {
-        return $this->client = parent::setRedisConfig($redisConfig);
+        $this->client = new Client(
+            [
+                'scheme' => 'tcp',
+                'host' => $redisConfig->getHost(),
+                'port' => $redisConfig->getPort(),
+            ]
+        );
+        return $this;
     }
 
     public function get($key)
