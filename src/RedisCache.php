@@ -138,14 +138,8 @@ final class RedisCache
 
     public function __invoke()
     {
-        // Parameters passed using a named array:
-        $this->client = new Client(
-            [
-                'scheme' => 'tcp',
-                'host' => $this->getRedisConfig()->getHost(),
-                'port' => $this->getRedisConfig()->getPort(),
-            ]
-        );
+        $this->client = (new RedisClient)
+            ->setRedisConfig($this->getRedisConfig());
 
         //如果传递值,意味是设置
         if ($this->getValue()) {

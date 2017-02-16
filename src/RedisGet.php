@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: xialintai
  * Date: 2017/2/15
- * Time: 18:16
+ * Time: 18:16.
  */
 
 namespace xltxlm\redis;
@@ -13,8 +13,7 @@ use xltxlm\redis\Config\RedisConfig;
 
 /**
  * 获取redis的key值,并且在一个进程内,相同key不再请求
- * Class RedisGet
- * @package xltxlm\redis
+ * Class RedisGet.
  */
 class RedisGet
 {
@@ -27,17 +26,14 @@ class RedisGet
 
     /**
      * @param RedisConfig $redisConfig
+     *
      * @return RedisGet
      */
     public function setRedisConfig(RedisConfig $redisConfig)
     {
-        $this->client = new Client(
-            [
-                'scheme' => 'tcp',
-                'host' => $redisConfig->getHost(),
-                'port' => $redisConfig->getPort(),
-            ]
-        );
+        $this->client = (new RedisClient())
+            ->setRedisConfig($redisConfig);
+
         return $this;
     }
 
@@ -46,6 +42,7 @@ class RedisGet
         if (empty(self::$keys[$key])) {
             self::$keys[$key] = $this->client->get($key);
         }
+
         return self::$keys[$key];
     }
 

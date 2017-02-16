@@ -10,11 +10,13 @@ namespace xltxlm\redis;
 
 use Predis\Client;
 use xltxlm\redis\Config\RedisConfig;
+use xltxlm\redis\Logger\RedisConnect;
 
 final class RedisClient
 {
     /** @var RedisConfig */
     protected $redisConfig;
+    private static $client = [];
 
     /**
      * @return RedisConfig
@@ -32,14 +34,18 @@ final class RedisClient
     public function setRedisConfig(RedisConfig $redisConfig): Client
     {
         // Parameters passed using a named array:
-        $client = new Client(
-            [
-                'scheme' => 'tcp',
-                'host' => $redisConfig->getHost(),
-                'port' => $redisConfig->getPort(),
-            ]
-        );
-
-        return $client;
+        $config = [
+            'scheme' => 'tcp',
+            'host' => $redisConfig->getHost(),
+            'port' => $redisConfig->getPort(),
+        ];
+        $key = md5(serialize($config));
+        if (!self::$client[$key]) {
+            self::$client[$key] = new Client(
+                $config
+            );
+            (new RedisConnect($config))();
+        }
+        return self::$client[$key];
     }
 }
