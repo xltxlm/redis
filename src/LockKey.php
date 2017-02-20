@@ -10,6 +10,7 @@ namespace xltxlm\redis;
 
 use Predis\Client;
 use xltxlm\redis\Config\RedisConfig;
+use xltxlm\redis\Logger\RedisRunLog;
 
 /**
  * redis锁
@@ -109,19 +110,15 @@ final class LockKey
     public function __invoke()
     {
         // Parameters passed using a named array:
-        $client = new Client(
-            [
-                'scheme' => 'tcp',
-                'host' => $this->getRedisConfig()->getHost(),
-                'port' => $this->getRedisConfig()->getPort(),
-            ]
-        );
+        $client = (new RedisClient)
+            ->setRedisConfig($this->getRedisConfig());
         //写入key,并且设置过期时间
         if ($client->setnx($this->getKey(), $this->getValue())) {
             if (!empty($this->getExpire())) {
                 $client->expire($this->getKey(), $this->getExpire());
             }
-
+            (new RedisRunLog($this))
+                ->__invoke();
             return true;
         }
 
