@@ -3,6 +3,7 @@
 namespace xltxlm\redis\Logger;
 
 use xltxlm\logger\Log\BasicLog;
+use xltxlm\redis\RedisClient;
 
 /**
  * Created by PhpStorm.
@@ -12,4 +13,13 @@ use xltxlm\logger\Log\BasicLog;
  */
 class RedisConnect extends BasicLog
 {
+
+    /**
+     * RedisConnect constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->setReource(RedisClient::class);
+    }
 }
