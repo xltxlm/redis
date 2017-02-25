@@ -11,7 +11,7 @@ use xltxlm\redis\RedisClient;
  * Date: 2017/2/16
  * Time: 10:14.
  */
-class RedisConnect extends BasicLog
+class RedisConnectLog extends BasicLog
 {
 
     /**

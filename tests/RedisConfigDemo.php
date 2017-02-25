@@ -13,4 +13,5 @@ use xltxlm\redis\Config\RedisConfig;
 class RedisConfigDemo extends RedisConfig
 {
     protected $host = '127.0.0.1';
+    protected $passwd = 'redispass123';
 }

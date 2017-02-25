@@ -10,7 +10,7 @@ namespace xltxlm\redis;
 
 use Predis\Client;
 use xltxlm\redis\Config\RedisConfig;
-use xltxlm\redis\Logger\RedisRunLog;
+use xltxlm\redis\Logger\RedisRunLogLog;
 
 /**
  * redis锁
@@ -117,7 +117,7 @@ final class LockKey
             if (!empty($this->getExpire())) {
                 $client->expire($this->getKey(), $this->getExpire());
             }
-            (new RedisRunLog($this))
+            (new RedisRunLogLog($this))
                 ->__invoke();
             return true;
         }

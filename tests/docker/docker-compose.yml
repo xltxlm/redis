@@ -3,6 +3,7 @@ version: '2'
 services:
   redis:
     image: redis
+    command: redis-server --appendonly yes --requirepass redispass123
     volumes:
       - ../../:/redis/
       - ./redis/:/data/
@@ -12,7 +13,6 @@ services:
           - redis
     ports:
         - "6379:6379/tcp"
-    entrypoint: "redis-server --appendonly yes"
     restart: always
 
 networks:

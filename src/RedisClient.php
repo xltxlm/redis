@@ -10,7 +10,7 @@ namespace xltxlm\redis;
 
 use Predis\Client;
 use xltxlm\redis\Config\RedisConfig;
-use xltxlm\redis\Logger\RedisConnect;
+use xltxlm\redis\Logger\RedisConnectLog;
 
 final class RedisClient
 {
@@ -37,14 +37,16 @@ final class RedisClient
         $config = [
             'scheme' => 'tcp',
             'host' => $redisConfig->getHost(),
-            'port' => $redisConfig->getPort(),
+            'port' => $redisConfig->getPort()
         ];
         $key = md5(serialize($config));
         if (!self::$client[$key]) {
-            self::$client[$key] = new Client(
-                $config
-            );
-            (new RedisConnect($config))();
+            $Client = new Client($config);
+            if ($redisConfig->getPasswd()) {
+                $Client->auth($redisConfig->getPasswd());
+            }
+            self::$client[$key] = $Client;
+            (new RedisConnectLog($config))();
         }
         return self::$client[$key];
     }

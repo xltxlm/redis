@@ -10,7 +10,7 @@ namespace xltxlm\redis;
 
 use Predis\Client;
 use xltxlm\redis\Config\RedisConfig;
-use xltxlm\redis\Logger\RedisRunLog;
+use xltxlm\redis\Logger\RedisRunLogLog;
 use xltxlm\redis\Util\RedisData;
 
 final class RedisCache
@@ -146,7 +146,7 @@ final class RedisCache
         if ($this->getValue()) {
             if ($this->isExpireToday()) {
                 $Expire = strtotime('tomorrow') - time();
-                (new RedisRunLog($this))
+                (new RedisRunLogLog($this))
                     ->__invoke();
                 return $this->client->setex($this->getKey(), $Expire, $this->getValue());
             }

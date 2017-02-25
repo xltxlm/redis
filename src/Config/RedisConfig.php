@@ -10,6 +10,7 @@ namespace xltxlm\redis\Config;
 
 use Predis\Client;
 use xltxlm\config\TestConfig;
+use xltxlm\redis\RedisClient;
 
 /**
  * Redis 配置信息
@@ -19,6 +20,26 @@ abstract class RedisConfig implements TestConfig
 {
     protected $host = '127.0.0.1';
     protected $port = 6379;
+    protected $passwd = '';
+
+    /**
+     * @return string
+     */
+    public function getPasswd(): string
+    {
+        return $this->passwd;
+    }
+
+    /**
+     * @param string $passwd
+     * @return static
+     */
+    public function setPasswd(string $passwd)
+    {
+        $this->passwd = $passwd;
+        return $this;
+    }
+
 
     /**
      * @return string
@@ -62,14 +83,8 @@ abstract class RedisConfig implements TestConfig
 
     public function test()
     {
-        // Parameters passed using a named array:
-        $client = new Client(
-            [
-                'scheme' => 'tcp',
-                'host' => $this->getHost(),
-                'port' => $this->getPort(),
-            ]
-        );
+        $client = (new RedisClient)
+            ->setRedisConfig($this);
         $message = "test message";
         $messageBack = $client->ping($message);
         return $messageBack;

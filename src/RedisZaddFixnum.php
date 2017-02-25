@@ -10,7 +10,7 @@ namespace xltxlm\redis;
 
 use Predis\Client;
 use xltxlm\redis\Config\RedisConfig;
-use xltxlm\redis\Logger\RedisRunLog;
+use xltxlm\redis\Logger\RedisRunLogLog;
 use xltxlm\redis\Util\ZaddUnit;
 
 /**
@@ -133,7 +133,7 @@ final class RedisZaddFixnum
      */
     public function setZaddUnit(ZaddUnit $ZaddUnit): RedisZaddFixnum
     {
-        (new RedisRunLog($this))
+        (new RedisRunLogLog($this))
             ->setMethod(__METHOD__)
             ->__invoke();
         $this->getRedisClient()->zadd($this->getKey(), $ZaddUnit->getScore(), $ZaddUnit->getName());
@@ -158,7 +158,7 @@ final class RedisZaddFixnum
             $score = $this->RedisClient->zscore($this->getKey(), $item);
             $ZaddUnit[] = (new ZaddUnit())->setName($item)->setScore($score);
         }
-        (new RedisRunLog($this))
+        (new RedisRunLogLog($this))
             ->setMethod(__METHOD__)
             ->__invoke();
         return $ZaddUnit;

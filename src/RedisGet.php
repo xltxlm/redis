@@ -10,7 +10,7 @@ namespace xltxlm\redis;
 
 use Predis\Client;
 use xltxlm\redis\Config\RedisConfig;
-use xltxlm\redis\Logger\RedisRunLog;
+use xltxlm\redis\Logger\RedisRunLogLog;
 
 /**
  * 获取redis的key值,并且在一个进程内,相同key不再请求
@@ -41,7 +41,7 @@ class RedisGet
     public function get($key)
     {
         if (empty(self::$keys[$key])) {
-            (new RedisRunLog($this))
+            (new RedisRunLogLog($this))
                 ->setMethod(__METHOD__)
                 ->__invoke();
             self::$keys[$key] = $this->client->get($key);
@@ -53,7 +53,7 @@ class RedisGet
     public function set($key, $value)
     {
         $this->client->set($key, $value);
-        (new RedisRunLog($this))
+        (new RedisRunLogLog($this))
             ->setMethod(__METHOD__)
             ->__invoke();
         self::$keys[$key] = $value;

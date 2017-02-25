@@ -13,7 +13,7 @@ namespace xltxlm\redis\Logger;
  * Class RedisRunLog
  * @package xltxlm\redis\Logger
  */
-class RedisRunLog extends RedisConnect
+class RedisRunLogLog extends RedisConnectLog
 {
     protected $method = "";
 
@@ -27,9 +27,9 @@ class RedisRunLog extends RedisConnect
 
     /**
      * @param string $method
-     * @return RedisRunLog
+     * @return RedisRunLogLog
      */
-    public function setMethod(string $method): RedisRunLog
+    public function setMethod(string $method): RedisRunLogLog
     {
         $this->method = $method;
         return $this;
