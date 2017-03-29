@@ -1,2 +1,9 @@
 /vendor/
 .idea
+/src/Config/DeployMakeTest.php
+/deployer/
+/install-dev.cmd
+/deployer.cmd
+/install-online.cmd
+/install-root@118.178.233.122.cmd
+/install-root@118.178.129.189.cmd

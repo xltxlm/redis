@@ -11,6 +11,7 @@
     "php": ">=7.0",
     "xltxlm/config": "*",
     "xltxlm/logger": "*",
+    "xltxlm/deployer": "*",
     "predis/predis": "*"
   },
   "autoload": {
