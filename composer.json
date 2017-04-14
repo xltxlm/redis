@@ -11,8 +11,10 @@
     "php": ">=7.0",
     "xltxlm/config": "*",
     "xltxlm/logger": "*",
-    "xltxlm/deployer": "*",
     "predis/predis": "*"
+  },
+  "require-dev": {
+    "xltxlm/deployer": "*"
   },
   "autoload": {
     "psr-4": {
