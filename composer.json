@@ -13,9 +13,6 @@
     "xltxlm/logger": "*",
     "predis/predis": "*"
   },
-  "require-dev": {
-    "xltxlm/deployer": "*"
-  },
   "autoload": {
     "psr-4": {
       "xltxlm\\redis\\": [
