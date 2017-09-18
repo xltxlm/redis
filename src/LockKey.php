@@ -10,7 +10,7 @@ namespace xltxlm\redis;
 
 use Predis\Client;
 use xltxlm\redis\Config\RedisConfig;
-use xltxlm\redis\Logger\RedisRunLogLog;
+use xltxlm\logger\Operation\Action\RedisRunLog;
 
 /**
  * redis锁
@@ -114,10 +114,13 @@ final class LockKey
             ->setRedisConfig($this->getRedisConfig());
         //写入key,并且设置过期时间
         if ($client->setnx($this->getKey(), $this->getValue())) {
+            $start = microtime(true);
             if (!empty($this->getExpire())) {
                 $client->expire($this->getKey(), $this->getExpire());
             }
-            (new RedisRunLogLog($this))
+            $time = sprintf('%.4f', microtime(true) - $start);
+            (new RedisRunLog($this))
+                ->setRunTime($time)
                 ->__invoke();
             return true;
         }

@@ -10,7 +10,7 @@ namespace xltxlm\redis;
 
 use Predis\Client;
 use xltxlm\redis\Config\RedisConfig;
-use xltxlm\redis\Logger\RedisRunLogLog;
+use xltxlm\logger\Operation\Action\RedisRunLog;
 use xltxlm\redis\Util\RedisData;
 
 final class RedisCache
@@ -137,33 +137,42 @@ final class RedisCache
         return $this->client->del([$this->key]);
     }
 
+    /**
+     * @return int|mixed|null
+     */
     public function __invoke()
     {
         $this->client = (new RedisClient)
             ->setRedisConfig($this->getRedisConfig());
 
+        $start = microtime(true);
         //如果传递值,意味是设置
         if ($this->getValue()) {
             if ($this->isExpireToday()) {
                 $Expire = strtotime('tomorrow') - time();
-                (new RedisRunLogLog($this))
-                    ->__invoke();
-                return $this->client->setex($this->getKey(), $Expire, $this->getValue());
-            }
-
-            return $this->client->setex($this->getKey(), $this->getExpire(), $this->getValue());
-        }
-        $str = $this->client->get($this->getKey());
-        if (!empty($str)) {
-            /** @var RedisData $unserialize */
-            $unserialize = unserialize($str);
-            if ($unserialize instanceof RedisData) {
-                return $unserialize->getData();
+                $setex = $this->client->setex($this->getKey(), $Expire, $this->getValue());
             } else {
-                return null;
+                $setex = $this->client->setex($this->getKey(), $this->getExpire(), $this->getValue());
+            }
+        } else {
+            $str = $this->client->get($this->getKey());
+            if (empty($str)) {
+                $setex = null;
+            } else {
+                /** @var RedisData $unserialize */
+                $unserialize = unserialize($str);
+                if ($unserialize instanceof RedisData) {
+                    $setex = $unserialize->getData();
+                } else {
+                    $setex = null;
+                }
             }
         }
+        $time = sprintf('%.4f', microtime(true) - $start);
+        (new RedisRunLog($this))
+            ->setRunTime($time)
+            ->__invoke();
 
-        return $str;
+        return $setex;
     }
 }

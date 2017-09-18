@@ -10,7 +10,7 @@ namespace xltxlm\redis;
 
 use Predis\Client;
 use xltxlm\redis\Config\RedisConfig;
-use xltxlm\redis\Logger\RedisRunLogLog;
+use xltxlm\logger\Operation\Action\RedisRunLog;
 use xltxlm\redis\Util\ZaddUnit;
 
 /**
@@ -133,10 +133,13 @@ final class RedisZaddFixnum
      */
     public function setZaddUnit(ZaddUnit $ZaddUnit): RedisZaddFixnum
     {
-        (new RedisRunLogLog($this))
+        $start = microtime(true);
+        $this->getRedisClient()->zadd($this->getKey(), $ZaddUnit->getScore(), $ZaddUnit->getName());
+        $time = sprintf('%.4f', microtime(true) - $start);
+        (new RedisRunLog($this))
+            ->setRunTime($time)
             ->setMethod(__METHOD__)
             ->__invoke();
-        $this->getRedisClient()->zadd($this->getKey(), $ZaddUnit->getScore(), $ZaddUnit->getName());
         return $this;
     }
 
@@ -145,6 +148,7 @@ final class RedisZaddFixnum
      */
     public function __invoke()
     {
+        $start = microtime(true);
         //截断数据,保留分数最大的内容
         if ($this->getOrderby() == self::ORDER_ASC) {
             $this->RedisClient->zremrangebyrank($this->getKey(), $this->getFixnum(), -1);
@@ -158,7 +162,9 @@ final class RedisZaddFixnum
             $score = $this->RedisClient->zscore($this->getKey(), $item);
             $ZaddUnit[] = (new ZaddUnit())->setName($item)->setScore($score);
         }
-        (new RedisRunLogLog($this))
+        $time = sprintf('%.4f', microtime(true) - $start);
+        (new RedisRunLog($this))
+            ->setRunTime($time)
             ->setMethod(__METHOD__)
             ->__invoke();
         return $ZaddUnit;
