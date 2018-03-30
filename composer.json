@@ -7,6 +7,14 @@
       "email": "xltxlm@qq.com"
     }
   ],
+
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "git@github.com:xltxlm/redis.git"
+    }
+  ],
+
   "require": {
     "php": ">=7.0",
     "xltxlm/config": "*",
@@ -17,13 +25,6 @@
     "psr-4": {
       "xltxlm\\redis\\": [
         "src/"
-      ]
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "xltxlm\\redis\\": [
-        "./"
       ]
     }
   }

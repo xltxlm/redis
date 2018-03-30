@@ -9,8 +9,8 @@
 namespace xltxlm\redis;
 
 use Predis\Client;
-use xltxlm\redis\Config\RedisConfig;
 use xltxlm\logger\Operation\Action\RedisRunLog;
+use xltxlm\redis\Config\RedisConfig;
 
 /**
  * redis锁
@@ -26,6 +26,27 @@ final class LockKey
     protected $value = '';
     /** @var int key过期自动解锁时间 */
     protected $expire = 0;
+    /** @var \Redis redis链接客户端 */
+    protected $client;
+
+    /**
+     * @return \Redis
+     */
+    public function getClient(): \Redis
+    {
+        return $this->client;
+    }
+
+    /**
+     * @param \Redis $client
+     * @return LockKey
+     */
+    public function setClient(\Redis $client): LockKey
+    {
+        $this->client = $client;
+        return $this;
+    }
+
 
     /**
      * @return RedisConfig
@@ -110,18 +131,10 @@ final class LockKey
     public function __invoke()
     {
         // Parameters passed using a named array:
-        $client = (new RedisClient)
-            ->setRedisConfig($this->getRedisConfig());
+        $this->setClient($this->getRedisConfig()->__invoke());
+
         //写入key,并且设置过期时间
-        if ($client->setnx($this->getKey(), $this->getValue())) {
-            $start = microtime(true);
-            if (!empty($this->getExpire())) {
-                $client->expire($this->getKey(), $this->getExpire());
-            }
-            $time = sprintf('%.4f', microtime(true) - $start);
-            (new RedisRunLog($this))
-                ->setRunTime($time)
-                ->__invoke();
+        if ($this->getClient()->set($this->getKey(), $this->getValue(), ['nx', 'ex' => $this->getExpire()])) {
             return true;
         }
 

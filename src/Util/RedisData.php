@@ -25,7 +25,7 @@ final class RedisData
      */
     public function __construct()
     {
-        $this->setAddTime(time());
+        $this->setAddTime(date('Y-m-d H:i:s'));
     }
 
 

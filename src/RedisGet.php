@@ -38,6 +38,26 @@ class RedisGet
         return $this;
     }
 
+    /**
+     * @return Client
+     */
+    public function getClient(): Client
+    {
+        return $this->client;
+    }
+
+    /**
+     * @param Client $client
+     * @return RedisGet
+     */
+    public function setClient(Client $client): RedisGet
+    {
+        $this->client = $client;
+        return $this;
+    }
+
+
+
     public function get($key)
     {
         if (empty(self::$keys[$key])) {

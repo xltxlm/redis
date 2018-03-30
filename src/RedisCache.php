@@ -28,6 +28,25 @@ final class RedisCache
     protected $redisConfig;
 
     /**
+     * @return \Redis
+     */
+    public function getClient(): Client
+    {
+        return $this->client;
+    }
+
+    /**
+     * @param \Redis $client
+     * @return RedisCache
+     */
+    public function setClient(\Redis $client): RedisCache
+    {
+        $this->client = $client;
+        return $this;
+    }
+
+
+    /**
      * @return RedisConfig
      */
     public function getRedisConfig(): RedisConfig
@@ -142,8 +161,7 @@ final class RedisCache
      */
     public function __invoke()
     {
-        $this->client = (new RedisClient)
-            ->setRedisConfig($this->getRedisConfig());
+        $this->setClient($this->getRedisConfig()->__invoke());
 
         $start = microtime(true);
         //如果传递值,意味是设置
@@ -155,12 +173,12 @@ final class RedisCache
                 $setex = $this->client->setex($this->getKey(), $this->getExpire(), $this->getValue());
             }
         } else {
-            $str = $this->client->get($this->getKey());
-            if (empty($str)) {
+            $cacheData = $this->client->get($this->getKey());
+            if (empty($cacheData)) {
                 $setex = null;
             } else {
                 /** @var RedisData $unserialize */
-                $unserialize = unserialize($str);
+                $unserialize = unserialize($cacheData);
                 if ($unserialize instanceof RedisData) {
                     $setex = $unserialize->getData();
                 } else {

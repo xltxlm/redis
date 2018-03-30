@@ -21,6 +21,27 @@ abstract class RedisConfig implements TestConfig
     protected $host = '127.0.0.1';
     protected $port = 6379;
     protected $passwd = '';
+    /** @var \Redis */
+    protected $redis;
+
+    /**
+     * @return \Redis
+     */
+    public function getRedis(): \Redis
+    {
+        return $this->redis;
+    }
+
+    /**
+     * @param \Redis $redis
+     * @return RedisConfig
+     */
+    public function setRedis(\Redis $redis): RedisConfig
+    {
+        $this->redis = $redis;
+        return $this;
+    }
+
 
     /**
      * @return string
@@ -79,6 +100,19 @@ abstract class RedisConfig implements TestConfig
         $this->port = $port;
 
         return $this;
+    }
+
+    /**
+     * @return \Redis 返回redis对象
+     */
+    public function __invoke()
+    {
+        $this->redis = new \Redis();
+        $this->redis->connect($this->getHost(), $this->getPort());
+        if ($this->getPasswd()) {
+            $this->redis->auth($this->getPasswd());
+        }
+        return $this->redis;
     }
 
     public function test()
