@@ -8,18 +8,10 @@
     }
   ],
 
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "git@github.com:xltxlm/redis.git"
-    }
-  ],
-
   "require": {
     "php": ">=7.0",
     "xltxlm/config": "*",
-    "xltxlm/logger": "*",
-    "predis/predis": "*"
+    "xltxlm/logger": "*"
   },
   "autoload": {
     "psr-4": {
