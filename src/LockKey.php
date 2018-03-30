@@ -13,7 +13,7 @@ use xltxlm\logger\Operation\Action\RedisRunLog;
 use xltxlm\redis\Config\RedisConfig;
 
 /**
- * redis锁
+ * redis锁,保证一个原子内锁上去
  * Class Lock.
  */
 final class LockKey
@@ -130,6 +130,9 @@ final class LockKey
 
     public function __invoke()
     {
+        if (!$this->getExpire()) {
+            throw new \Exception("redis当作锁的时候，必须有超时时间");
+        }
         // Parameters passed using a named array:
         $this->setClient($this->getRedisConfig()->__invoke());
 
