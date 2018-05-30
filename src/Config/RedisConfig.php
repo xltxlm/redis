@@ -21,26 +21,6 @@ abstract class RedisConfig implements TestConfig
     protected $host = '127.0.0.1';
     protected $port = 6379;
     protected $passwd = '';
-    /** @var \Redis */
-    protected $redis;
-
-    /**
-     * @return \Redis
-     */
-    public function getRedis(): \Redis
-    {
-        return $this->redis;
-    }
-
-    /**
-     * @param \Redis $redis
-     * @return RedisConfig
-     */
-    public function setRedis(\Redis $redis): RedisConfig
-    {
-        $this->redis = $redis;
-        return $this;
-    }
 
 
     /**
@@ -107,18 +87,23 @@ abstract class RedisConfig implements TestConfig
      */
     public function __invoke()
     {
-        $this->redis = new \Redis();
-        $this->redis->connect($this->getHost(), $this->getPort());
-        if ($this->getPasswd()) {
-            $this->redis->auth($this->getPasswd());
+        /** @var \Redis[] $client */
+        static $client = [];
+
+        $key = md5(serialize($this)).'@'.posix_getpid();
+        if (!$client[$key]) {
+            $client[$key] = new \Redis();
+            $client[$key]->connect($this->getHost(), $this->getPort());
+            if ($this->getPasswd()) {
+                $client[$key]->auth($this->getPasswd());
+            }
         }
-        return $this->redis;
+        return $client[$key];
     }
 
     public function test()
     {
-        $client = (new RedisClient)
-            ->setRedisConfig($this);
+        $client = $this->__invoke();
         $message = "test message";
         $messageBack = $client->ping($message);
         return $messageBack;

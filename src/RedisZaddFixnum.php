@@ -8,7 +8,6 @@
 
 namespace xltxlm\redis;
 
-use Predis\Client;
 use xltxlm\redis\Config\RedisConfig;
 use xltxlm\logger\Operation\Action\RedisRunLog;
 use xltxlm\redis\Util\ZaddUnit;
@@ -21,7 +20,7 @@ final class RedisZaddFixnum
 {
     public const ORDER_ASC = __LINE__;
     public const ORDER_DESC = __LINE__;
-    /** @var  Client */
+    /** @var  \Redis */
     private $RedisClient;
     /** @var string 集合的名称 */
     protected $key = '';
@@ -30,12 +29,12 @@ final class RedisZaddFixnum
     /** @var int 排序方向 */
     protected $orderby = self::ORDER_DESC;
     /** @var RedisConfig */
-    protected $config;
+    protected $redisConfig;
 
     /**
-     * @return Client
+     * @return \Redis
      */
-    public function getRedisClient(): Client
+    public function getRedisClient() :\Redis
     {
         return $this->RedisClient;
     }
@@ -108,7 +107,7 @@ final class RedisZaddFixnum
     /**
      * @return RedisConfig
      */
-    public function getConfig(): RedisConfig
+    public function getRedisConfig(): RedisConfig
     {
         return $this->config;
     }
@@ -118,29 +117,37 @@ final class RedisZaddFixnum
      *
      * @return RedisZaddFixnum
      */
-    public function setConfig(RedisConfig $config): RedisZaddFixnum
+    public function setRedisConfig(RedisConfig $redisConfig): RedisZaddFixnum
     {
-        $this->config = $config;
-        $this->RedisClient = (new RedisClient())->setRedisConfig($this->getConfig());
+        $this->redisConfig = $redisConfig;
+        /** @var \Redis RedisClient */
+        $this->RedisClient = $redisConfig->__invoke();
         return $this;
     }
 
 
     /**
+     * 追加单元队列
      * @param ZaddUnit $ZaddUnit
      *
      * @return RedisZaddFixnum
      */
     public function setZaddUnit(ZaddUnit $ZaddUnit): RedisZaddFixnum
     {
-        $start = microtime(true);
+        $redisRunLog = new RedisRunLog($this);
         $this->getRedisClient()->zadd($this->getKey(), $ZaddUnit->getScore(), $ZaddUnit->getName());
-        $time = sprintf('%.4f', microtime(true) - $start);
-        (new RedisRunLog($this))
-            ->setRunTime($time)
+        $redisRunLog
             ->setMethod(__METHOD__)
             ->__invoke();
         return $this;
+    }
+
+    /**
+     * 删除有序集合队列
+     */
+    public function clear()
+    {
+        $this->getRedisClient()->del($this->getKey());
     }
 
     /**
@@ -148,7 +155,7 @@ final class RedisZaddFixnum
      */
     public function __invoke()
     {
-        $start = microtime(true);
+        $redisRunLog = new RedisRunLog($this);
         //截断数据,保留分数最大的内容
         if ($this->getOrderby() == self::ORDER_ASC) {
             $this->RedisClient->zremrangebyrank($this->getKey(), $this->getFixnum(), -1);
@@ -162,9 +169,7 @@ final class RedisZaddFixnum
             $score = $this->RedisClient->zscore($this->getKey(), $item);
             $ZaddUnit[] = (new ZaddUnit())->setName($item)->setScore($score);
         }
-        $time = sprintf('%.4f', microtime(true) - $start);
-        (new RedisRunLog($this))
-            ->setRunTime($time)
+        $redisRunLog
             ->setMethod(__METHOD__)
             ->__invoke();
         return $ZaddUnit;

@@ -8,7 +8,6 @@
 
 namespace xltxlm\redis;
 
-use Predis\Client;
 use xltxlm\redis\Config\RedisConfig;
 use xltxlm\logger\Operation\Action\RedisRunLog;
 
@@ -19,7 +18,7 @@ use xltxlm\logger\Operation\Action\RedisRunLog;
 class RedisGet
 {
     protected static $keys = [];
-    /** @var Client */
+    /** @var \Redis */
     protected $client;
 
     /** @var RedisConfig */
@@ -39,33 +38,30 @@ class RedisGet
     }
 
     /**
-     * @return Client
+     * @return \Redis
      */
-    public function getClient(): Client
+    public function getClient(): \Redis
     {
         return $this->client;
     }
 
     /**
-     * @param Client $client
+     * @param \Redis $client
      * @return RedisGet
      */
-    public function setClient(Client $client): RedisGet
+    public function setClient(\Redis $client): RedisGet
     {
         $this->client = $client;
         return $this;
     }
 
 
-
     public function get($key)
     {
         if (empty(self::$keys[$key])) {
-            $start = microtime(true);
+            $redisRunLog = new RedisRunLog($this);
             self::$keys[$key] = $this->client->get($key);
-            $time = sprintf('%.4f', microtime(true) - $start);
-            (new RedisRunLog($this))
-                ->setRunTime($time)
+            $redisRunLog
                 ->setMethod(__METHOD__)
                 ->__invoke();
         }
@@ -75,12 +71,10 @@ class RedisGet
 
     public function set($key, $value)
     {
-        $start = microtime(true);
+        $redisRunLog = new RedisRunLog($this);
         $this->client->set($key, $value);
         self::$keys[$key] = $value;
-        $time = sprintf('%.4f', microtime(true) - $start);
-        (new RedisRunLog($this))
-            ->setRunTime($time)
+        $redisRunLog
             ->setMethod(__METHOD__)
             ->__invoke();
     }

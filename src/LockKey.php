@@ -143,4 +143,13 @@ final class LockKey
 
         return false;
     }
+
+    /**
+     * 不能在析构的时候自动注销，因为多线程情况会父进程的锁会被子进程给注销掉
+     * @return mixed
+     */
+    public function free()
+    {
+        return $this->getClient()->eval("if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end", [$this->getKey(), $this->getValue()], 1);
+    }
 }

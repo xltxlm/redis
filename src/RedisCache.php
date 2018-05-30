@@ -27,6 +27,28 @@ final class RedisCache
     /** @var RedisConfig */
     protected $redisConfig;
 
+    /** @var bool 判断是否已经存在的标志，不能取值去进行判断！ */
+    protected $cached = false;
+
+    /**
+     * @return bool
+     */
+    public function isCached(): bool
+    {
+        return $this->cached;
+    }
+
+    /**
+     * @param bool $cached
+     * @return RedisCache
+     */
+    public function setCached(bool $cached): RedisCache
+    {
+        $this->cached = $cached;
+        return $this;
+    }
+
+
     /**
      * @return \Redis
      */
@@ -163,7 +185,8 @@ final class RedisCache
     {
         $this->setClient($this->getRedisConfig()->__invoke());
 
-        $start = microtime(true);
+        $redisRunLog = (new RedisRunLog($this))
+            ->setKey($this->getKey());
         //如果传递值,意味是设置
         if ($this->getValue()) {
             if ($this->isExpireToday()) {
@@ -181,14 +204,14 @@ final class RedisCache
                 $unserialize = unserialize($cacheData);
                 if ($unserialize instanceof RedisData) {
                     $setex = $unserialize->getData();
+                    $redisRunLog->setCached(true);
+                    $this->setCached(true);
                 } else {
                     $setex = null;
                 }
             }
         }
-        $time = sprintf('%.4f', microtime(true) - $start);
-        (new RedisRunLog($this))
-            ->setRunTime($time)
+        $redisRunLog
             ->__invoke();
 
         return $setex;
