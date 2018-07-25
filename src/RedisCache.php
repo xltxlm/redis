@@ -8,7 +8,6 @@
 
 namespace xltxlm\redis;
 
-use Predis\Client;
 use xltxlm\redis\Config\RedisConfig;
 use xltxlm\logger\Operation\Action\RedisRunLog;
 use xltxlm\redis\Util\RedisData;
@@ -16,7 +15,7 @@ use xltxlm\redis\Util\RedisData;
 final class RedisCache
 {
     protected $key = '';
-    /** @var Client */
+    /** @var \Redis */
     private $client;
     /** @var mixed */
     protected $value;
@@ -52,7 +51,7 @@ final class RedisCache
     /**
      * @return \Redis
      */
-    public function getClient(): Client
+    public function getClient(): \Redis
     {
         return $this->client;
     }

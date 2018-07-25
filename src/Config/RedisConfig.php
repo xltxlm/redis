@@ -8,9 +8,7 @@
 
 namespace xltxlm\redis\Config;
 
-use Predis\Client;
 use xltxlm\config\TestConfig;
-use xltxlm\redis\RedisClient;
 
 /**
  * Redis 配置信息
@@ -83,6 +81,21 @@ abstract class RedisConfig implements TestConfig
     }
 
     /**
+     * 返回自增id序列
+     * @return  string
+     */
+    public function snownum()
+    {
+        $client = $this->__invoke();
+        $seqnum = $client->rPop('snownum_list');
+        $取不出序号 = !$seqnum;
+        if ($取不出序号) {
+            throw new \Exception("序号分发器取不出自增id: $seqnum");
+        }
+        return $seqnum;
+    }
+
+    /**
      * @return \Redis 返回redis对象
      */
     public function __invoke()
@@ -90,7 +103,7 @@ abstract class RedisConfig implements TestConfig
         /** @var \Redis[] $client */
         static $client = [];
 
-        $key = md5(serialize($this)).'@'.posix_getpid();
+        $key = md5(serialize($this)) . '@' . posix_getpid();
         if (!$client[$key]) {
             $client[$key] = new \Redis();
             $client[$key]->connect($this->getHost(), $this->getPort());

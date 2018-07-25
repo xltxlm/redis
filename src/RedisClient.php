@@ -8,10 +8,8 @@
 
 namespace xltxlm\redis;
 
-use Predis\Client;
 use Redis;
 use xltxlm\redis\Config\RedisConfig;
-use xltxlm\logger\Operation\Connect\RedisConnectLog;
 
 final class RedisClient
 {

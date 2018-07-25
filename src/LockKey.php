@@ -9,6 +9,7 @@
 namespace xltxlm\redis;
 
 use Predis\Client;
+use xltxlm\helper\Ctroller\RunInvokeBreak;
 use xltxlm\logger\Operation\Action\RedisRunLog;
 use xltxlm\redis\Config\RedisConfig;
 
@@ -28,6 +29,28 @@ final class LockKey
     protected $expire = 0;
     /** @var \Redis redis链接客户端 */
     protected $client;
+
+    /** @var bool 死循环等到锁被释放 */
+    protected $waitForunlock = false;
+
+    /**
+     * @return bool
+     */
+    public function isWaitForunlock(): bool
+    {
+        return $this->waitForunlock;
+    }
+
+    /**
+     * @param bool $waitForunlock
+     * @return LockKey
+     */
+    public function setWaitForunlock(bool $waitForunlock): LockKey
+    {
+        $this->waitForunlock = $waitForunlock;
+        return $this;
+    }
+
 
     /**
      * @return \Redis
@@ -135,13 +158,22 @@ final class LockKey
         }
         // Parameters passed using a named array:
         $this->setClient($this->getRedisConfig()->__invoke());
-
-        //写入key,并且设置过期时间
-        if ($this->getClient()->set($this->getKey(), $this->getValue(), ['nx', 'ex' => $this->getExpire()])) {
-            return true;
-        }
-
-        return false;
+        $waittimes = 0;
+        do {
+            //写入key,并且设置过期时间
+            if ($this->getClient()->set($this->getKey(), $this->getValue(), ['nx', 'ex' => $this->getExpire()])) {
+                return true;
+            }
+            if ($this->isWaitForunlock()) {
+                $waittimes++;
+                if ($waittimes > 1000) {
+                    return false;
+                }
+                usleep(10);
+            } else {
+                return false;
+            }
+        } while (true);
     }
 
     /**
