@@ -3,20 +3,19 @@
   "description": "redis操作类",
   "authors": [
     {
-      "name": "xltxlm",
+      "name": "copygithub",
       "email": "xltxlm@qq.com"
     }
   ],
-
   "require": {
-    "php": ">=7.0",
-    "xltxlm/config": "*",
-    "xltxlm/logger": "*"
+    "php": ">=7.1",
+    "xltxlm/resources": "@dev"
   },
   "autoload": {
     "psr-4": {
       "xltxlm\\redis\\": [
-        "src/"
+        "src/",
+        "./"
       ]
     }
   }
