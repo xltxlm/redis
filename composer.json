@@ -9,6 +9,7 @@
   ],
   "require": {
     "php": ">=7.1",
+    "xltxlm/exception": "@dev",
     "xltxlm/resources": "@dev"
   },
   "autoload": {
