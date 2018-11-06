@@ -8,6 +8,20 @@ namespace xltxlm\redis\Features;
  */
 class Redis_LockKey extends Redis_LockKey\Redis_LockKey_implements
 {
+
+    /**
+     * Redis_LockKey constructor.
+     */
+    public function __construct(string $key = '', int $expire = 0)
+    {
+        if ($key) {
+            $this->setkey($key);
+        }
+        if ($expire) {
+            $this->setexpire($expire);
+        }
+    }
+
     public function __invoke(): bool
     {
         if ($this->getExpire() < 1) {
@@ -21,11 +35,10 @@ class Redis_LockKey extends Redis_LockKey\Redis_LockKey_implements
             }
 
             //锁定失败的时候抛出异常
-            if($this->getException_on_LockFail())
-            {
+            if ($this->getException_on_LockFail()) {
                 throw (new \xltxlm\redis\Exception\Redis_LockKey\LockFall_Exception())
-                ->setRedisConfig($this->getRedisConfig())
-                ->setRedis_LockKey($this);
+                    ->setRedisConfig($this->getRedisConfig())
+                    ->setRedis_LockKey($this);
             }
             if ($this->getTry_Wait_Second()) {
                 $waittimes++;
