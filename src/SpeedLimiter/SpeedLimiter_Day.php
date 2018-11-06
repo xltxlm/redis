@@ -11,7 +11,8 @@ class SpeedLimiter_Day extends SpeedLimiter_Day\SpeedLimiter_Day_implements
 {
     public function getcycletime(): int
     {
-        return 3600 * 24;
+        $leftseconds = strtotime('tomorrow') - strtotime('today');
+        return $leftseconds;
     }
 
 
