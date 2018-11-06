@@ -11,3 +11,4 @@
 /vendor/**/.git
 src/testconfig/
 temp
+vendor/**/.git

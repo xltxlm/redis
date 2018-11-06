@@ -8,9 +8,6 @@
 
 namespace xltxlm\redis;
 
-use Predis\Client;
-use xltxlm\helper\Ctroller\RunInvokeBreak;
-use xltxlm\logger\Operation\Action\RedisRunLog;
 use xltxlm\redis\Config\RedisConfig;
 
 /**
@@ -136,7 +133,7 @@ final class LockKey
      */
     public function getValue(): string
     {
-        return $this->value ?: date('Y-m-d H:i:s');
+        return $this->value = $this->value ?: date('Y-m-d H:i:s');
     }
 
     /**
