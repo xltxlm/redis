@@ -49,7 +49,7 @@ Trait SpeedLimiter
             $redisclient->expire($this->getrealkey(), $this->getcycletime());
         }
         //超速了
-        if ($times >= $this->getMaxtimes()) {
+        if ($num >= $this->getMaxtimes()) {
             if ($this->getException_on_LockFail()) {
                 throw new \xltxlm\redis\Exception\SpeedLimiter\Exception_SpeedLimiter_outofspeed();
             }

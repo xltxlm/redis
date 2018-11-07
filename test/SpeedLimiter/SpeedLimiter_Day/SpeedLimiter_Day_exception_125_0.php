@@ -19,7 +19,7 @@ class SpeedLimiter_Day_exception_125_0
         $redisConfig = (new my());
         $key = 'abc';
         $num = 3;
-        $redisConfig->__invoke()->del("abc86400");
+        $redisConfig->__invoke()->del("abc".'-' . date('Ymd'));
         for ($i = 0; $i < $num; $i++) {
             $locked = (new SpeedLimiter_Day($key, 3))
                 ->setRedisConfig($redisConfig)
