@@ -128,7 +128,7 @@ Trait Redis_Bucket_implements
      * @param string $realkey;
      * @return $this
      */
-    public function setrealkey(string $realkey)
+    protected function setrealkey(string $realkey)
     {
         $this->realkey = $realkey;
         return $this;
@@ -159,7 +159,7 @@ Trait Redis_Bucket_implements
         return $this;
     }
 
-    /* @var string   */
+    /* @var string  要限制的标志位 */
         protected $key = '';
     
 
@@ -181,6 +181,31 @@ Trait Redis_Bucket_implements
     public function setkey(string $key)
     {
         $this->key = $key;
+        return $this;
+    }
+
+    /* @var array  取回所有已经存储的元素 */
+        protected $AllItems = [];
+    
+
+
+    /**
+     * @return array;
+     */
+    public function getAllItems():array    {
+        return $this->AllItems;
+    }
+
+
+
+
+    /**
+     * @param array $AllItems;
+     * @return $this
+     */
+    protected function setAllItems(array $AllItems)
+    {
+        $this->AllItems = $AllItems;
         return $this;
     }
 

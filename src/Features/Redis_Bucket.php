@@ -28,18 +28,17 @@ Trait Redis_Bucket
         }
     }
 
+    public function getAllItems(): array
+    {
+        $redisclient = $this->redisclient();
+        return $redisclient->sMembers($this->getrealkey());
+    }
+
 
     public function __invoke(): bool
     {
-        //判断参数
-        if (empty($this->key)) {
-            throw new \xltxlm\redis\Exception\SpeedLimiter\Exception_SpeedLimiter_nokey();
-        }
-        if (empty($this->RedisConfig)) {
-            throw new \xltxlm\redis\Exception\SpeedLimiter\Exception_SpeedLimiter_noconfig();
-        }
-        //
-        $redisclient = $this->getRedisConfig()->__invoke();
+        $redisclient = $this->redisclient();
+
 
         //排队处理
         $Redis_LockKey = (new Redis_LockKey($this->key . '-lock', 1))
@@ -71,6 +70,20 @@ Trait Redis_Bucket
         }
         $Redis_LockKey->free();
         return true;
+    }
+
+    private function redisclient(): \Redis
+    {
+        //判断参数
+        if (empty($this->key)) {
+            throw new \xltxlm\redis\Exception\SpeedLimiter\Exception_SpeedLimiter_nokey();
+        }
+        if (empty($this->RedisConfig)) {
+            throw new \xltxlm\redis\Exception\SpeedLimiter\Exception_SpeedLimiter_noconfig();
+        }
+        //
+        $redisclient = $this->getRedisConfig()->__invoke();
+        return $redisclient;
     }
 
 
