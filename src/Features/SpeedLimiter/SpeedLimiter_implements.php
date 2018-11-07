@@ -9,7 +9,7 @@ Trait SpeedLimiter_implements
 
 
 
-    /* @var \xltxlm\redis\Config\RedisConfig Redis配置 */
+    /* @var \xltxlm\redis\Config\RedisConfig  Redis配置 */
         protected $RedisConfig;
     
 
@@ -34,7 +34,7 @@ Trait SpeedLimiter_implements
         return $this;
     }
 
-    /* @var string 要限速的key */
+    /* @var string  要限速的key */
         protected $key = '';
     
 
@@ -59,7 +59,7 @@ Trait SpeedLimiter_implements
         return $this;
     }
 
-    /* @var int 限速周期 */
+    /* @var int  限速周期 */
         protected $cycletime = 0;
     
 
@@ -78,13 +78,13 @@ Trait SpeedLimiter_implements
      * @param int $cycletime;
      * @return $this
      */
-    protected function setcycletime(int $cycletime)
+    public function setcycletime(int $cycletime)
     {
         $this->cycletime = $cycletime;
         return $this;
     }
 
-    /* @var int 周期内最大速率 */
+    /* @var int  周期内最大速率 */
         protected $maxtimes = 0;
     
 
@@ -109,7 +109,7 @@ Trait SpeedLimiter_implements
         return $this;
     }
 
-    /* @var bool 超速了,抛出异常 */
+    /* @var bool  超速了,抛出异常 */
         protected $Exception_on_LockFail = false;
     
 
@@ -131,6 +131,31 @@ Trait SpeedLimiter_implements
     public function setException_on_LockFail(bool $Exception_on_LockFail)
     {
         $this->Exception_on_LockFail = $Exception_on_LockFail;
+        return $this;
+    }
+
+    /* @var string  真正存储的key,带上时间概念的 */
+        protected $realkey = '';
+    
+
+
+    /**
+     * @return string;
+     */
+    public function getrealkey():string    {
+        return $this->realkey;
+    }
+
+
+
+
+    /**
+     * @param string $realkey;
+     * @return $this
+     */
+    public function setrealkey(string $realkey)
+    {
+        $this->realkey = $realkey;
         return $this;
     }
 

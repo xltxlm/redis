@@ -35,8 +35,7 @@ Trait SpeedLimiter
         }
         //
         $redisclient = $this->getRedisConfig()->__invoke();
-        $realkey = $this->getKey() . $this->getcycletime();
-        $times = $redisclient->get($realkey);
+        $times = $redisclient->get($this->getrealkey());
         //超速了
         if ($times >= $this->getMaxtimes()) {
             if ($this->getException_on_LockFail()) {
@@ -44,10 +43,10 @@ Trait SpeedLimiter
             }
             return false;
         }
-        $num = $redisclient->incr($realkey);
+        $num = $redisclient->incr($this->getrealkey());
         if ($num == 1) {
-            //设置对应的过期时间
-            $redisclient->expire($realkey, $this->getcycletime());
+            //第一次加设置对应的过期时间
+            $redisclient->expire($this->getrealkey(), $this->getcycletime());
         }
         //超速了
         if ($times >= $this->getMaxtimes()) {
