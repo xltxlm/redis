@@ -209,6 +209,56 @@ Trait Redis_Bucket_implements
         return $this;
     }
 
+    /* @var int  剩余可用量 */
+        protected $Remain_num = 0;
+    
+
+
+    /**
+     * @return int;
+     */
+    public function getRemain_num():int    {
+        return $this->Remain_num;
+    }
+
+
+
+
+    /**
+     * @param int $Remain_num;
+     * @return $this
+     */
+    protected function setRemain_num(int $Remain_num)
+    {
+        $this->Remain_num = $Remain_num;
+        return $this;
+    }
+
+    /* @var int  已消耗量 */
+        protected $Consumed_num = 0;
+    
+
+
+    /**
+     * @return int;
+     */
+    public function getConsumed_num():int    {
+        return $this->Consumed_num;
+    }
+
+
+
+
+    /**
+     * @param int $Consumed_num;
+     * @return $this
+     */
+    protected function setConsumed_num(int $Consumed_num)
+    {
+        $this->Consumed_num = $Consumed_num;
+        return $this;
+    }
+
     /**
      *   确认是否已经满了;
      *   @return :bool;

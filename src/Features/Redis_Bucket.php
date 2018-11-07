@@ -34,6 +34,19 @@ Trait Redis_Bucket
         return $redisclient->sMembers($this->getrealkey());
     }
 
+    public function getRemain_num(): int
+    {
+        $this->Remain_num = $this->getmaxtimes() - $this->getConsumed_num();
+        return $this->Remain_num;
+    }
+
+    public function getConsumed_num(): int
+    {
+        $redisclient = $this->redisclient();
+        $this->Consumed_num = $redisclient->sCard($this->getrealkey());
+        return $this->Consumed_num;
+    }
+
 
     public function __invoke(): bool
     {
