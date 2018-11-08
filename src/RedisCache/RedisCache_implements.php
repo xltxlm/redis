@@ -24,6 +24,8 @@ abstract class RedisCache_implements
 
 
 
+
+
     /**
      * @param string $key;
      * @return $this
@@ -45,6 +47,8 @@ abstract class RedisCache_implements
     public function getRedisConfig():\xltxlm\redis\Config\RedisConfig    {
         return $this->RedisConfig;
     }
+
+
 
 
 
@@ -74,6 +78,8 @@ abstract class RedisCache_implements
 
 
 
+
+
     /**
      * @param int $expire;
      * @return $this
@@ -96,6 +102,11 @@ abstract class RedisCache_implements
         return $this->cached;
     }
 
+
+    public function iscached():bool    {
+            return $this->getcached();
+    }
+    
 
 
 
@@ -120,6 +131,8 @@ abstract class RedisCache_implements
     public function getvalue()    {
         return $this->value;
     }
+
+
 
 
 
