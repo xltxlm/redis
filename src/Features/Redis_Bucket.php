@@ -61,7 +61,7 @@ Trait Redis_Bucket
             ->__invoke();
         if ($串行 == false) {
             $Redis_LockKey->free();
-            return false;
+            throw new \xltxlm\redis\Exception\SpeedLimiter\Exception_SpeedLimiter_lockerror("{$this->key}-lock lock error");
         }
 
         $times = $redisclient->sCard($this->getrealkey());
