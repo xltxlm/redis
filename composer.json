@@ -7,8 +7,10 @@
       "email": "xltxlm@qq.com"
     }
   ],
+  "minimum-stability": "dev",
   "require": {
     "php": ">=7.1",
+    "xltxlm/classinfo": "@dev",
     "xltxlm/exception": "@dev",
     "xltxlm/resources": "@dev"
   },

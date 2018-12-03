@@ -8,18 +8,15 @@
 
 namespace xltxlm\redis\Config;
 
-use xltxlm\resources\Config\ConfigDefineTrait;
+use xltxlm\redis\Exception\Config\Exception_Connect_error;
 
 
 /**
- * @method \Redis __invoke()
  * Redis 配置信息
  * Class RedisConfig.
  */
 class RedisConfig extends RedisConfig\RedisConfig_implements implements \xltxlm\resources\Config\ConfigDefine
 {
-    use ConfigDefineTrait;
-
     /**
      * 返回自增id序列
      * @return  string
@@ -41,9 +38,14 @@ class RedisConfig extends RedisConfig\RedisConfig_implements implements \xltxlm\
     public function NewConnect(): \Redis
     {
         $client = new \Redis();
-        $client->connect($this->getTns(), $this->getPort());
-        if ($this->getPassword()) {
-            $client->auth($this->getPassword());
+        try {
+            $client->connect($this->getTns(), $this->getPort());
+            if ($this->getPassword()) {
+                $client->auth($this->getPassword());
+            }
+        } catch (\Throwable $e) {
+            p($this->__Object_toJson());
+            throw new Exception_Connect_error($this->__Object_toJson() . '|' . $e->__toString());
         }
         return $client;
     }
