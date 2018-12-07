@@ -44,7 +44,6 @@ class RedisConfig extends RedisConfig\RedisConfig_implements implements \xltxlm\
                 $client->auth($this->getPassword());
             }
         } catch (\Throwable $e) {
-            p($this->__Object_toJson());
             throw new Exception_Connect_error($this->__Object_toJson() . '|' . $e->__toString());
         }
         return $client;
