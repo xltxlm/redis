@@ -3,7 +3,7 @@
 namespace xltxlm\redis\test\BucketLimit\BucketLimit_Day;
 
 use xltxlm\redis\BucketLimit\BucketLimit_Day;
-use xltxlm\redis\testconfig\my;
+use xltxlm\redis\test\testconfig\my;
 
 /**
  *

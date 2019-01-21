@@ -8,6 +8,8 @@
 
 namespace xltxlm\redis;
 
+use xltxlm\logger\Mysqllog\Mysqllog_TraitClass;
+use xltxlm\logger\Thelostlog\Thelostlog_redis;
 use xltxlm\redis\Config\RedisConfig;
 
 /**
@@ -159,15 +161,23 @@ final class LockKey
         do {
             //写入key,并且设置过期时间
             if ($this->getClient()->set($this->getKey(), $this->getValue(), ['nx', 'ex' => $this->getExpire()])) {
+                $thelostlog_redis = (new Thelostlog_redis("加锁成功:{$this->getKey()}"));
+                unset($thelostlog_redis);
                 return true;
             }
             if ($this->isWaitForunlock()) {
                 $waittimes++;
                 if ($waittimes > 1000) {
+                    $thelostlog_redis = (new Thelostlog_redis("等待1000次,加锁失败:{$this->getKey()}"))
+                    ->setmessage_type(Mysqllog_TraitClass::MESSAGETYPE_ERROR);
+                    unset($thelostlog_redis);
                     return false;
                 }
                 usleep(10);
             } else {
+                $thelostlog_redis = (new Thelostlog_redis("加锁失败:{$this->getKey()}"))
+                ->setmessage_type(Mysqllog_TraitClass::MESSAGETYPE_ERROR);
+                unset($thelostlog_redis);
                 return false;
             }
         } while (true);

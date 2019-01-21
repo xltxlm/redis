@@ -3,7 +3,7 @@
 namespace xltxlm\redis\test\RedisCache;
 
 use xltxlm\redis\RedisCache;
-use xltxlm\redis\testconfig\my;
+use xltxlm\redis\test\testconfig\my;
 
 /**
  *

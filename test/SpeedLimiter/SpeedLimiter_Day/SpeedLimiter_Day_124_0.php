@@ -3,7 +3,7 @@
 namespace xltxlm\redis\test\SpeedLimiter\SpeedLimiter_Day;
 
 use xltxlm\redis\SpeedLimiter\SpeedLimiter_Day;
-use xltxlm\redis\testconfig\my;
+use xltxlm\redis\test\testconfig\my;
 
 /**
  *

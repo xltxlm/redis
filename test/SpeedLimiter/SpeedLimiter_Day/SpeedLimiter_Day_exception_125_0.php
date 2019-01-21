@@ -6,7 +6,7 @@ use xltxlm\redis\Exception\SpeedLimiter\Exception_SpeedLimiter_noconfig;
 use xltxlm\redis\Exception\SpeedLimiter\Exception_SpeedLimiter_nokey;
 use xltxlm\redis\Exception\SpeedLimiter\Exception_SpeedLimiter_outofspeed;
 use xltxlm\redis\SpeedLimiter\SpeedLimiter_Day;
-use xltxlm\redis\testconfig\my;
+use xltxlm\redis\test\testconfig\my;
 
 /**
  *

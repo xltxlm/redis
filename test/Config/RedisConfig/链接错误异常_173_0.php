@@ -2,7 +2,7 @@
 
 namespace xltxlm\redis\test\Config\RedisConfig;
 
-use xltxlm\redis\testconfig\my;
+use xltxlm\redis\test\testconfig\my;
 
 /**
  *

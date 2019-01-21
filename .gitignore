@@ -12,3 +12,4 @@
 src/testconfig/
 temp
 vendor/**/.git
+gitpush.sh

@@ -4,7 +4,7 @@ namespace xltxlm\redis\test\Features\Redis_LockKey;
 
 use xltxlm\redis\Exception\Redis_LockKey\LockFall_Exception;
 use xltxlm\redis\Features\Redis_LockKey;
-use xltxlm\redis\testconfig\my;
+use xltxlm\redis\test\testconfig\my;
 
 /**
  *

@@ -8,6 +8,7 @@
 
 namespace xltxlm\redis\Config;
 
+use xltxlm\logger\Resource_define\Resource_define_redis;
 use xltxlm\redis\Exception\Config\Exception_Connect_error;
 
 
@@ -39,6 +40,14 @@ class RedisConfig extends RedisConfig\RedisConfig_implements implements \xltxlm\
     {
         $client = new \Redis();
         try {
+            try {
+                $this->connectlog = (new Resource_define_redis())
+                    ->settns($this->getTns())
+                    ->setuser($this->getPassword())
+                    ->setport($this->getPort());
+            } catch (\Exception $e) {
+            }
+
             $client->connect($this->getTns(), $this->getPort());
             if ($this->getPassword()) {
                 $client->auth($this->getPassword());

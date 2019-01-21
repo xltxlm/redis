@@ -3,7 +3,7 @@
 namespace xltxlm\redis\test\Features\Redis_LockKey;
 
 use xltxlm\redis\Features\Redis_LockKey;
-use xltxlm\redis\testconfig\my;
+use xltxlm\redis\test\testconfig\my;
 
 /**
  *
