@@ -19,21 +19,6 @@ use xltxlm\redis\Exception\Config\Exception_Connect_error;
 class RedisConfig extends RedisConfig\RedisConfig_implements implements \xltxlm\resources\Config\ConfigDefine
 {
     /**
-     * 返回自增id序列
-     * @return  string
-     */
-    public function snownum()
-    {
-        $client = $this->__invoke();
-        $seqnum = $client->rPop('snownum_list');
-        $取不出序号 = !$seqnum;
-        if ($取不出序号) {
-            throw new \Exception("{$this->getTns()}:{$this->getPort()}|序号分发器取不出自增id: $seqnum");
-        }
-        return $seqnum;
-    }
-
-    /**
      * @return \Redis 返回redis对象
      */
     public function NewConnect(): \Redis
@@ -54,7 +39,9 @@ class RedisConfig extends RedisConfig\RedisConfig_implements implements \xltxlm\
             }
         } catch (\Throwable $e) {
             p($e->getTraceAsString());
-            throw new Exception_Connect_error($this->__Object_toJson() . '|' . $e->__toString());
+            //类的定义
+            $filename = (new \ReflectionClass(static::class))->getFileName();
+            throw new Exception_Connect_error("配置文件:${filename}," . $this->__Object_toJson() . '|' . $e->__toString());
         }
         return $client;
     }
