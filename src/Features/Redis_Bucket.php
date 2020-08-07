@@ -3,8 +3,14 @@
 namespace xltxlm\redis\Features;
 
 
+use xltxlm\redis\Exception\SpeedLimiter\Exception_SpeedLimiter_lockerror;
+use xltxlm\redis\Exception\SpeedLimiter\Exception_SpeedLimiter_noconfig;
+use xltxlm\redis\Exception\SpeedLimiter\Exception_SpeedLimiter_nokey;
+use xltxlm\redis\Exception\SpeedLimiter\Exception_SpeedLimiter_outofspeed;
+
 /**
- * 限制每天的额度;
+ * 限制每天的额度-桶 map; 应用于限制给某个人一天之内之内推荐N给内容，超出了就再会，
+ * 参考类：  \xltxlm\redis\BucketLimit\BucketLimit_Day
  */
 Trait Redis_Bucket
 {
@@ -57,16 +63,18 @@ Trait Redis_Bucket
         $Redis_LockKey = (new Redis_LockKey($this->key . '-lock', 1))
             ->setRedisConfig($this->getRedisConfig())
             ->setTry_Wait_Second(3);
-        $串行 = $Redis_LockKey
+        $获取业务锁 = $Redis_LockKey
             ->__invoke();
-        if ($串行 == false) {
+        //取锁失败了
+        if ($获取业务锁 == false) {
             $Redis_LockKey->free();
-            throw new \xltxlm\redis\Exception\SpeedLimiter\Exception_SpeedLimiter_lockerror("{$this->key}-lock lock error");
+            throw new Exception_SpeedLimiter_lockerror("{$this->key}-lock lock error");
         }
 
-        $times = $redisclient->sCard($this->getrealkey());
+        //获取当前桶里面元素的个数
+        $item_nums = $redisclient->sCard($this->getrealkey());
         //超速了
-        if ($times >= $this->getMaxtimes()) {
+        if ($item_nums >= $this->getMaxtimes()) {
             $Redis_LockKey->free();
             //如果设置的是老元素,那么可以继续
             if ($有设置写入值 && $redisclient->sIsMember($this->getrealkey(), $this->getvalue())) {
@@ -74,12 +82,12 @@ Trait Redis_Bucket
             }
 
             if ($this->getException_on_LockFail()) {
-                throw new \xltxlm\redis\Exception\SpeedLimiter\Exception_SpeedLimiter_outofspeed();
+                throw new Exception_SpeedLimiter_outofspeed();
             }
             return false;
         }
-        if ($times = 1) {
-            //第一次加设置对应的过期时间
+        //第一次加设置对应的过期时间
+        if ($item_nums = 1) {
             $redisclient->expire($this->getrealkey(), $this->getexpire());
         }
         //如果有值,设置进去
@@ -90,14 +98,19 @@ Trait Redis_Bucket
         return true;
     }
 
+    /**
+     * @return \Redis
+     * @throws Exception_SpeedLimiter_noconfig
+     * @throws Exception_SpeedLimiter_nokey
+     */
     private function redisclient(): \Redis
     {
         //判断参数
         if (empty($this->key)) {
-            throw new \xltxlm\redis\Exception\SpeedLimiter\Exception_SpeedLimiter_nokey();
+            throw new Exception_SpeedLimiter_nokey();
         }
         if (empty($this->RedisConfig)) {
-            throw new \xltxlm\redis\Exception\SpeedLimiter\Exception_SpeedLimiter_noconfig();
+            throw new Exception_SpeedLimiter_noconfig();
         }
         //
         $redisclient = $this->getRedisConfig()->__invoke();

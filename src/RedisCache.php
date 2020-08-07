@@ -8,8 +8,7 @@
 
 namespace xltxlm\redis;
 
-use xltxlm\logger\Mysqllog\Mysqllog_TraitClass;
-use xltxlm\logger\Thelostlog\Thelostlog_redis;
+use xltxlm\logger\LoggerTrack;
 use xltxlm\redis\Util\RedisData;
 
 class RedisCache extends RedisCache\RedisCache_implements
@@ -36,6 +35,7 @@ class RedisCache extends RedisCache\RedisCache_implements
      */
     public function setValue($value): RedisCache
     {
+        /** @var \Redis $redisclient */
         $redisclient = $this->getRedisConfig()->__invoke();
         $RedisData = (new RedisData())
             ->setData($value);
@@ -51,12 +51,12 @@ class RedisCache extends RedisCache\RedisCache_implements
      */
     public function __invoke()
     {
+        /** @var \Redis $redisclient */
         $redisclient = $this->getRedisConfig()->__invoke();
 
         $cacheData = $redisclient->get($this->getKey());
         if (empty($cacheData)) {
-            $thelostlog_redis = (new Thelostlog_redis("缓存不存在:{$this->getKey()}"));
-            unset($thelostlog_redis);
+            (new LoggerTrack())->setresource_type('redis')->setcontext(['message' => "缓存不存在:{$this->getKey()}"])->__invoke();
             $setex = null;
         } else {
             /** @var RedisData $unserialize */
@@ -64,11 +64,9 @@ class RedisCache extends RedisCache\RedisCache_implements
             if ($unserialize instanceof RedisData) {
                 $setex = $unserialize->getData();
                 $this->setCached(true);
-                $thelostlog_redis = (new Thelostlog_redis("命中缓存成功:{$this->getKey()}"));
-            unset($thelostlog_redis);
+                (new LoggerTrack())->setresource_type('redis')->setcontext(['message' => "命中缓存成功:{$this->getKey()}"])->__invoke();
             } else {
-                $thelostlog_redis = (new Thelostlog_redis("缓存解码失败:{$this->getKey()}"));
-            unset($thelostlog_redis);
+                (new LoggerTrack())->setresource_type('redis')->setcontext(['message' => "缓存解码失败:{$this->getKey()}"])->__invoke();
                 $setex = null;
             }
         }

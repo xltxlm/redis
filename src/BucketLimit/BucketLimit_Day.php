@@ -4,7 +4,7 @@ namespace xltxlm\redis\BucketLimit;
 
 
 /**
- * 每日限量;
+ * 每日限量推荐;
  */
 class BucketLimit_Day extends BucketLimit_Day\BucketLimit_Day_implements
 {

@@ -8,8 +8,7 @@
 
 namespace xltxlm\redis;
 
-use xltxlm\logger\Mysqllog\Mysqllog_TraitClass;
-use xltxlm\logger\Thelostlog\Thelostlog_redis;
+use xltxlm\logger\LoggerTrack;
 use xltxlm\redis\Config\RedisConfig;
 
 /**
@@ -150,10 +149,17 @@ final class LockKey
         return $this;
     }
 
+    /**
+     * @return bool
+     * @throws \Exception
+     */
     public function __invoke()
     {
+        $loggerTrack = (new LoggerTrack())->setresource_type('redis');
         if (!$this->getExpire()) {
-            throw new \Exception("redis当作锁的时候，必须有超时时间");
+            $exception = "redis当作锁的时候，必须有超时时间.[尝试锁住：{$this->getKey()}]";
+            $loggerTrack->setcontext(['exception' => $exception]);
+            throw new \Exception($exception);
         }
         // Parameters passed using a named array:
         $this->setClient($this->getRedisConfig()->__invoke());
@@ -161,23 +167,18 @@ final class LockKey
         do {
             //写入key,并且设置过期时间
             if ($this->getClient()->set($this->getKey(), $this->getValue(), ['nx', 'ex' => $this->getExpire()])) {
-                $thelostlog_redis = (new Thelostlog_redis("加锁成功:{$this->getKey()}"));
-                unset($thelostlog_redis);
+                $loggerTrack->setcontext(["message" => "加锁成功:{$this->getKey()}"])->__invoke();
                 return true;
             }
             if ($this->isWaitForunlock()) {
                 $waittimes++;
-                if ($waittimes > 1000) {
-                    $thelostlog_redis = (new Thelostlog_redis("等待1000次,加锁失败:{$this->getKey()}"))
-                    ->setmessage_type(Mysqllog_TraitClass::MESSAGETYPE_ERROR);
-                    unset($thelostlog_redis);
+                if ($waittimes > 10) {
+                    $loggerTrack->setcontext(["exception" => "等待10次,加锁失败:{$this->getKey()}"])->__invoke();
                     return false;
                 }
                 usleep(10);
             } else {
-                $thelostlog_redis = (new Thelostlog_redis("加锁失败:{$this->getKey()}"))
-                ->setmessage_type(Mysqllog_TraitClass::MESSAGETYPE_ERROR);
-                unset($thelostlog_redis);
+                $loggerTrack->setcontext(["exception" => "加锁失败:{$this->getKey()}"])->__invoke();
                 return false;
             }
         } while (true);
@@ -185,10 +186,17 @@ final class LockKey
 
     /**
      * 不能在析构的时候自动注销，因为多线程情况会父进程的锁会被子进程给注销掉
+     *
      * @return mixed
      */
     public function free()
     {
-        return $this->getClient()->eval("if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end", [$this->getKey(), $this->getValue()], 1);
+        $loggerTrack = (new LoggerTrack())->setresource_type('redis')->setcontext(['message' => "释放锁：{$this->getKey()}"]);
+        $eval = $this->getClient()->eval("if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end", [$this->getKey(), $this->getValue()], 1);
+        if (!$eval) {
+            $loggerTrack->setcontext(["exception" => "释放锁失败：{$this->getKey()}"]);
+        }
+        $loggerTrack->__invoke();
+        return $eval;
     }
 }

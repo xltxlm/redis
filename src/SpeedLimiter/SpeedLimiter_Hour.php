@@ -2,7 +2,6 @@
 
 namespace xltxlm\redis\SpeedLimiter;
 
-use \xltxlm\redis\Features\SpeedLimiter;
 
 /**
  * 每小时区间限速;

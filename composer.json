@@ -10,6 +10,7 @@
   "minimum-stability": "dev",
   "require": {
     "php": ">=7.1",
+    "ext-redis": "*",
     "xltxlm/classinfo": "@dev",
     "xltxlm/exception": "@dev",
     "xltxlm/resources": "@dev",

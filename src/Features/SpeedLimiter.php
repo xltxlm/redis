@@ -3,6 +3,10 @@
 namespace xltxlm\redis\Features;
 
 
+use xltxlm\redis\Exception\SpeedLimiter\Exception_SpeedLimiter_noconfig;
+use xltxlm\redis\Exception\SpeedLimiter\Exception_SpeedLimiter_nokey;
+use xltxlm\redis\Exception\SpeedLimiter\Exception_SpeedLimiter_outofspeed;
+
 /**
  * 限速光卡;
  */
@@ -28,19 +32,22 @@ Trait SpeedLimiter
     {
         //判断参数
         if (empty($this->key)) {
-            throw new \xltxlm\redis\Exception\SpeedLimiter\Exception_SpeedLimiter_nokey();
+            throw new Exception_SpeedLimiter_nokey();
         }
         if (empty($this->RedisConfig)) {
-            throw new \xltxlm\redis\Exception\SpeedLimiter\Exception_SpeedLimiter_noconfig();
+            throw new Exception_SpeedLimiter_noconfig();
         }
-        //
+        /** @var \Redis $redisclient */
         $redisclient = $this->getRedisConfig()->__invoke();
-        $times = $redisclient->get($this->getrealkey());
+        //查出当前已经使用的额度
+        $use_times = $redisclient->get($this->getrealkey());
         //超速了
-        if ($times >= $this->getMaxtimes()) {
+        if ($use_times >= $this->getMaxtimes()) {
+            //超速抛出异常
             if ($this->getException_on_LockFail()) {
-                throw new \xltxlm\redis\Exception\SpeedLimiter\Exception_SpeedLimiter_outofspeed();
+                throw new Exception_SpeedLimiter_outofspeed();
             }
+            //或者超速返回失败
             return false;
         }
         $num = $redisclient->incr($this->getrealkey());
@@ -51,7 +58,7 @@ Trait SpeedLimiter
         //超速了
         if ($num >= $this->getMaxtimes()) {
             if ($this->getException_on_LockFail()) {
-                throw new \xltxlm\redis\Exception\SpeedLimiter\Exception_SpeedLimiter_outofspeed();
+                throw new Exception_SpeedLimiter_outofspeed();
             }
             return false;
         }
